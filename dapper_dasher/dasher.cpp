@@ -9,21 +9,27 @@ int main()
 
     InitWindow(windowWidth, windowHeight, "Dapper Dasher");
 
-    // player character size
-
-    const int width{50};
-    const int height{80};
+    Texture2D scarfy = LoadTexture("textures/scarfy.png");
+    Rectangle scarfyRec;
+    scarfyRec.width = scarfy.width/6;
+    scarfyRec.height = scarfy.height;
+    scarfyRec.x = 0;
+    scarfyRec.y = 0;
+    Vector2 scarfyPos; // position of scarfy
+    scarfyPos.x = windowWidth/2 - scarfyRec.width/2;
+    scarfyPos.y = windowHeight - scarfyRec.height;
+    
+    
 
     // acceleartion due to gravity (pixels/frame)/frame)
-    const int gravity{1};
+    const int gravity{1'000}; 
 
     // rectangle in the air
     bool isInAir{false};
 
-    // jump velocity
-    const int jumpVel{-22};
+    // jump velocity (pixels/second)
+    const int jumpVel{-600};
 
-    int posY{windowHeight - height};
     int velocity{0};
 
     SetTargetFPS(60);
@@ -32,9 +38,10 @@ int main()
     {
         BeginDrawing();
         ClearBackground(WHITE);
+        float dT = GetFrameTime();
 
         // perform a ground check
-        if (posY >= windowHeight - height)
+        if (scarfyPos.y >= windowHeight - scarfyRec.height)
         {
             // rectangle is on the ground
             velocity = 0;
@@ -43,9 +50,10 @@ int main()
         else
         {
             // rectangle is in the air
-            velocity += gravity;
+            velocity += gravity * dT;
             isInAir = true;
         }
+
 
         // jump check
         if (IsKeyPressed(KEY_SPACE) && isInAir == false)
@@ -54,11 +62,12 @@ int main()
         }
 
         // update the velocity
-        posY += velocity;
+        scarfyPos.y += velocity * dT;
 
-        DrawRectangle(windowWidth / 2, posY, width, height, BLUE);
+        DrawTextureRec(scarfy, scarfyRec, scarfyPos, WHITE);
 
         EndDrawing();
     }
+    UnloadTexture(scarfy);
     CloseWindow();
 }
